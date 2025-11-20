@@ -29,7 +29,7 @@ export const createCard = (req: Request, res: Response) => {
     link,
     owner: req.user._id, // вот здесь используем временного пользователя
   })
-    .then((card) => res.send({ data: card }))
+    .then((card) => res.status(201).send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res
