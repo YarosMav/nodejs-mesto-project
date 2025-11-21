@@ -52,7 +52,12 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
       email,
       password: hash,
     }))
-    .then((user) => res.status(201).send({ data: user }))
+    .then((user) => {
+      const userObj = user.toObject() as Record<string, any>;
+      delete userObj.password;
+
+      return res.status(201).send({ data: userObj });
+    })
     .catch((err) => {
       if (err.code === 11000) {
         return next(new ConflictError('Пользователь с таким email уже существует'));
