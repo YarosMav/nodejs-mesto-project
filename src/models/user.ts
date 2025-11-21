@@ -1,32 +1,46 @@
-// models/user.ts
+// src/models/user.ts
+import mongoose, { Schema, Document } from 'mongoose';
+import urlRegex from '../utils/regex';
 
-import mongoose from 'mongoose';
-
-interface IUser {
-  name: string,
-  about: string,
-  avatar: string
+interface IUser extends Document {
+  name: string;
+  about: string;
+  avatar: string;
+  email: string;
+  password: string;
 }
-// Опишем схему:
-const userSchema = new mongoose.Schema({
+
+const userSchema = new Schema<IUser>({
   name: {
     type: String,
-    required: true,
     minlength: 2,
     maxlength: 30,
+    default: 'Жак-Ив Кусто',
   },
   about: {
-    required: true,
-    minlength: 2,
-    maxlength: 200,
     type: String,
+    minlength: 2,
+    maxlength: 30,
+    default: 'Исследователь',
   },
   avatar: {
     type: String,
-    required: true,
+    default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
+    validate: {
+      validator: (v: string) => urlRegex.test(v),
+      message: 'Некорректная ссылка на аватар',
+    },
   },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  password: {
+    type: String,
+    required: true,
+    select: false, // чтобы хэш пароля не возвращался по умолчанию
+  },
+}, { versionKey: false });
 
-});
-
-// создаём модель и экспортируем её
 export default mongoose.model<IUser>('user', userSchema);
